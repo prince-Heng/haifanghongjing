@@ -1,0 +1,216 @@
+<template>
+  <div id="boxContainer">
+    <div class="top">
+      <div class="discounts" v-if="items.priceMin===items.priceMax">{{items.priceMax | addZero}}</div>
+      <div class="discounts" v-else>{{ items.priceMin | addZero}} ~{{items.priceMax | addZero}}</div>
+      <van-count-down
+        v-if="items.endtime"
+        :time="items.endtime*1000 - curtime  "
+        format="DDd HH:mm:ss"
+      />
+      <!-- <div class="discounts">{{`降价后：₽ ${items.price}`}}</div> -->
+      <!-- <div class="price">{{`原价：₽ ${items.price}`}}</div> -->
+    </div>
+
+    <!-- 库存   购买数量选择 -->
+    <div span="6" class="all">{{$lang['库存'] + '：'+ allStock + $lang['件']}}</div>
+    <van-row class="quantity">
+      <van-col span="6" class="number">{{$lang['数量']}}</van-col>
+      <van-col span="8">
+        <van-stepper :max="allStock" v-model="productNumber" integer/>
+      </van-col>
+      <van-col span="4" class="unit">{{$lang['件']}}</van-col>
+    </van-row>
+    <!-- sku 选择弹层-->
+    <skuList></skuList>
+    <div class="parame">
+      <!-- 参数表弹层 -->
+      <van-cell is-link @click="showParmas">{{$lang['参数'] + $lang['规格'] + '...'}}</van-cell>
+      <van-popup v-model="parmas" round position="bottom" :style="{ height: '50%' }">
+        <div class="paramsTitle">{{$lang['产品参数']}}</div>
+        <van-cell-group class="dataList" v-for="(item,index) in length" :key="index">
+          <van-cell :title="parmaKey[item]" :value="parmaVal[item]" />
+        </van-cell-group>
+      </van-popup>
+    </div>
+    <!-- 商品详情 -->
+    <div class="productTitle">{{$lang['商品详情']}}</div>
+    <van-divider :style="{color:'#999'}"></van-divider>
+    <div class="container">{{this.items.title}}</div>
+  </div>
+</template>
+
+<script>
+//import x from ''
+
+import { eventBus } from "@/main";
+import { Toast } from "vant";
+import skuList from "./skuList"
+export default {
+  name: "other",
+  props: {
+    items: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    }
+  },
+
+  data() {
+    return {
+      lists: null, //传入购物车数据
+      allStock: 0, //全部sku库存
+      length: 0, //循环数据
+      parmaKey: [], //key
+      parmaVal: [], //val
+      isRed: false, //控制选择样式
+      colorIndex: "", //控制选择样式
+      productNumber: 1,
+      index: 0,
+      sku: {},
+      messageConfig: {},
+      show: false, //控制商品sku选择弹层显示
+      parmas: false,
+      skuData: [],
+      minPrice: this.items.priceMin,
+      maxPrice: this.items.priceMax,
+      priceList: [],
+      imgSrc: "",
+      text: "",
+      skuPrice: "",
+      skuStock: 0, //sku库存
+      curtime: new Date().getTime()
+    };
+  },
+  components: {
+      skuList
+  },
+  computed: {},
+  watch: {
+    productNumber(newValue, oldValue) {
+      if (this.lists) {
+        this.lists.productNumber = newValue;
+        eventBus.$emit("getSkuData", this.lists);
+      }
+    }
+  },
+  methods: {
+    // 商品参数弹层控制
+    showParmas() {
+      this.parmas = true;
+    },
+    // 获取参数配置
+    getParameter() {
+      this.parmaKey.push(...Object.keys(this.items.attributeList));
+      this.parmaVal.push(...Object.values(this.items.attributeList));
+      this.length = Object.keys(this.items.attributeList).length;
+    },
+    //   商品sku选择弹层显示控制
+    showPopup() {
+      this.show = true;
+    },
+
+    //  点击切换样式更新顶部
+    changeStyle(index) {
+      this.colorIndex = index;
+    }
+  },
+  created() {
+    this.getParameter();
+  },
+  beforeMount() {},
+  mounted() {},
+  activated() {}
+};
+</script>
+<style scoped lang="less">
+#boxContainer {
+  margin-bottom: 50px;
+}
+.top {
+  background-color: #ff2d2d;
+  position: relative;
+
+  .discounts {
+    font-size: 25px;
+    color: #fff;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 13px;
+  }
+
+  /deep/.van-count-down {
+    padding: 0px 20px;
+    font-size: 18px;
+    position: absolute;
+    right: 0px;
+    top: 20px;
+    color: #fff;
+  }
+
+  .price {
+    text-decoration: line-through;
+    font-size: 14px;
+    color: #fff;
+    height: 25px;
+    line-height: 25px;
+    padding-left: 13px;
+  }
+}
+
+.all {
+  padding-left: 20px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 16px;
+  border-top: 10px solid #eeeeee;
+  background: #fff;
+}
+
+.quantity {
+  font-size: 16px;
+  // margin: 10px 0 8px 0;
+  border-top: 10px solid #eeeeee;
+  border-bottom: 10px solid #eeeeee;
+  height: 50px;
+  line-height: 50px;
+  background: #fff;
+
+  .number {
+    margin-left: 10px;
+    margin-right: 50px;
+  }
+
+  .unit {
+    margin-left: 20px;
+  }
+}
+
+.parame {
+  margin-bottom: 5px;
+  border-bottom: 10px solid #eeeeee;
+}
+
+.paramsTitle {
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.dataList {
+  padding: 0 10px;
+}
+
+.productTitle {
+  // color: #ccc;
+  margin-top: 20px 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.container {
+  text-align: center;
+  font-size: 12px;
+}
+</style>

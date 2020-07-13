@@ -1,0 +1,188 @@
+<template>
+  <div class="right">
+    <div class="category">
+      <van-collapse v-model="activeNames" @change="change">
+        <van-collapse-item
+          v-for="(item, index) in goods"
+          :name="index"
+          :key="index"
+        >
+          <template #title>
+            <div> 
+              <img :src="`${imgURL}${item.img}`" alt="">
+              {{item.name}}
+            </div>
+          </template>
+
+          <div class="goodsBox">
+            <ul class="goodsMar">
+              <li
+                class="goods"
+                v-for="(i, index) in item.gropus"
+                :key="index"
+                @click="listGood(i.id)"
+              >
+                <img :src="i.img" alt="" />
+                <!-- <img :src="item.img" alt /> -->
+                <span class="flex align-center justify-center _1qVto">
+                  <span class="bae_X">{{ i.name }}</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </van-collapse-item>
+      </van-collapse>
+    </div>
+  </div>
+</template>
+
+<script>
+import baseImg from "@/utils/imgConfig";
+export default {
+  name: "Right",
+  props: {
+    goods: {
+      type: Array,
+      default: () => {
+        return [];
+      },
+    },
+  },
+  data() {
+    return {
+      bollean: 0,
+      activeNames: [],
+      show: true,
+      imgURL: baseImg.baseImg,
+    };
+  },
+  watch: {
+    // 监听父组件传值变化
+    goods(newVal, oldVal) {
+      if (newVal != oldVal) {
+        this.activeNames = [];
+      }
+    },
+  },
+
+  mounted() {
+    console.log(this.goods);
+  },
+  methods: {
+    // 点击进入每一个商品
+    listGood(id) {
+      console.log(id);
+      // this.$router.push(`/listPage/${id}`);
+    },
+    // 触发折叠面板切换事件
+    // change(e) {
+    //   console.log(e)
+    //   if (e.length > 0) {
+    //     let index = e[e.length - 1];
+    //     if (this.goods[index].gropus.length == 0) {
+    //       const id = this.goods[index].id;
+    //       this.$router.push(`/listPage/${id}`);
+    //     }
+    //   }
+    // },
+  },
+};
+</script>
+
+<style lang="less" scoped>
+.right {
+  
+  flex: 7;
+  position: relative;
+  overflow: scroll;
+  box-sizing: border-box;
+  background-color: #fff;
+  /deep/.van-collapse-item__content {
+    padding: 0;
+    .goodsBox {
+      .goodsMar {
+        display: flex;
+        flex-wrap: wrap;
+        padding-left: 25px;
+        background-color: rgb(255, 255, 255);
+        position: relative;
+        .goods {
+          display: inline-block;
+          width: 70px;
+          position: relative;
+          box-sizing: border-box;
+          padding: 5px;
+          img {
+            width: 100%;
+          }
+          .flex {
+            display: flex;
+          }
+          .align-center {
+            align-items: center;
+          }
+          .justify-center {
+            justify-content: center;
+          }
+          ._1qVto {
+            //   height: 39px;
+            .bae_X {
+              text-align: center;
+              overflow: hidden;
+              word-break: break-word;
+              display: -webkit-box;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 2;
+
+              font-size: 12px;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+  .goodsBox {
+    .goodsMar {
+      display: flex;
+      flex-wrap: wrap;
+      padding-left: 18px;
+      background-color: rgb(255, 255, 255);
+      position: relative;
+      .goods {
+        display: inline-block;
+        width: 65px;
+        position: relative;
+        box-sizing: border-box;
+        padding: 5px;
+        img {
+          width: 100%;
+        }
+        .flex {
+          display: flex;
+        }
+        .align-center {
+          align-items: center;
+        }
+        .justify-center {
+          justify-content: center;
+        }
+        ._1qVto {
+          //   height: 39px;
+          .bae_X {
+            text-align: center;
+            overflow: hidden;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+
+            font-size: 12px;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

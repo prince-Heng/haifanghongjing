@@ -1,0 +1,6 @@
+let baseImg = 'http://www.shopvill.tm/api/avatar/img?id='
+//let ImgSerevr = "http://58.87.108.47:7777"
+let ImgSerevr = 'http://www.shopvill.tm/api'
+
+let ImgUrlPath = ImgSerevr + "/avatar/img?id="
+export default ImgUrlPath
